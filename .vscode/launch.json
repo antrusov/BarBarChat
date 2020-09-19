@@ -32,7 +32,7 @@
             "program": "${workspaceFolder}/ClientConsole/bin/Debug/netcoreapp2.1/ClientConsole.dll",
             "args": [],
             "cwd": "${workspaceFolder}/ClientConsole",
-            "console": "integratedTerminal",
+            "console": "externalTerminal",
             "stopAtEntry": false
         },
         {
