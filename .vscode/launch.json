@@ -5,13 +5,13 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": ".NET Core Launch (web)",
+            "name": "Server3",
             "type": "coreclr",
             "request": "launch",
-            "preLaunchTask": "build",
-            "program": "${workspaceFolder}/Server/bin/Debug/netcoreapp2.1/Server.dll",
+            "preLaunchTask": "buildServer3",
+            "program": "${workspaceFolder}/Server3/bin/Debug/netcoreapp3.1/Server3.dll",
             "args": [],
-            "cwd": "${workspaceFolder}",
+            "cwd": "${workspaceFolder}/Server3",
             "stopAtEntry": false,
             "serverReadyAction": {
                 "action": "openExternally",
@@ -21,22 +21,22 @@
                 "ASPNETCORE_ENVIRONMENT": "Development"
             },
             "sourceFileMap": {
-                "/Views": "${workspaceFolder}/Views"
+                "/Views": "${workspaceFolder}/Server3/Views"
             }
         },
         {
-            "name": ".NET Core Launch (console)",
+            "name": "ClientConsole",
             "type": "coreclr",
             "request": "launch",
-            "preLaunchTask": "build",
-            "program": "${workspaceFolder}/ClientConsole/bin/Debug/netcoreapp2.1/ClientConsole.dll",
+            "preLaunchTask": "buildClinetConsole",
+            "program": "${workspaceFolder}/ClientConsole/bin/Debug/netcoreapp3.1/ClientConsole.dll",
             "args": [],
             "cwd": "${workspaceFolder}/ClientConsole",
-            "console": "externalTerminal",
-            "stopAtEntry": false
+            "stopAtEntry": false,
+            "console": "externalTerminal"
         },
         {
-            "name": ".NET Core Attach",
+            "name": "Attach",
             "type": "coreclr",
             "request": "attach",
             "processId": "${command:pickProcess}"

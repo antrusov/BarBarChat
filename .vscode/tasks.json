@@ -2,7 +2,19 @@
     "version": "2.0.0",
     "tasks": [
         {
-            "label": "build",
+            "label": "buildServer3",
+            "command": "dotnet",
+            "type": "process",
+            "args": [
+                "build",
+                "${workspaceFolder}/Server3/Server3.csproj",
+                "/property:GenerateFullPaths=true",
+                "/consoleloggerparameters:NoSummary"
+            ],
+            "problemMatcher": "$msCompile"
+        },
+        {
+            "label": "buildClinetConsole",
             "command": "dotnet",
             "type": "process",
             "args": [
@@ -14,7 +26,7 @@
             "problemMatcher": "$msCompile"
         },
         {
-            "label": "publish",
+            "label": "publishClinetConsole",
             "command": "dotnet",
             "type": "process",
             "args": [
@@ -26,7 +38,7 @@
             "problemMatcher": "$msCompile"
         },
         {
-            "label": "watch",
+            "label": "watchClinetConsole",
             "command": "dotnet",
             "type": "process",
             "args": [
