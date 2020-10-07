@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using Library.Models;
 
 namespace Server3.Controllers
 {
@@ -15,7 +16,12 @@ namespace Server3.Controllers
         [HttpGet("{id}")]
         public ActionResult GetUser(string id)
         {
-            return Ok($"get 1");
+            var user = new User() {
+                Id = 111,
+                Title = "Админ Рутович",
+                Birth = DateTime.Now.AddYears(-20)
+            };
+            return Ok(user);
         }
 
         [HttpGet("search/{pattern}")]
