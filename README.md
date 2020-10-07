@@ -4,4 +4,4 @@
 ## Структура папок
 * ClinetConsole - клиентское консольное приложение
 * Library - библиотека для работы с общим кодом
-* Server3 - сервер
+* Server3 - сервер (http://localhost:5000/swagger/index.html)
