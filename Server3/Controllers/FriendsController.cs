@@ -11,15 +11,23 @@ namespace Server3.Controllers
     [Route("friends")]
     public class FriendsController : ControllerBase
     {
-        [HttpGet]
-        public ActionResult Add(string id)
-        {
-            return Ok($"friend with id {id} added!");
-        }
-        //find
-        //add
-        //del
-        //get 1
         //get all
-    }    
+        [HttpGet]
+        public ActionResult GetAllFriends()
+        {
+            return Ok($"get all");
+        }
+
+        [HttpPost("{id}")]
+        public ActionResult AddFriend(string id)
+        {
+            return Ok($"friend with id={id} was added");
+        }
+
+        [HttpDelete("{id}")]
+        public ActionResult RemoveFriend(string id)
+        {
+            return Ok($"friend with id={id} was delete");
+        }
+   }    
 }
