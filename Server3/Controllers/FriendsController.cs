@@ -15,7 +15,7 @@ namespace Server3.Controllers
         [HttpGet]
         public ActionResult GetAllFriends()
         {
-            return Ok($"get all");
+            return Ok($"FriendsController.GetAllFriends");
         }
 
         [HttpPost("{id}")]
