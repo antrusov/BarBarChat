@@ -30,5 +30,11 @@ namespace Server3.Controllers
             return Ok($"search result for pattern='{pattern}'");
         }
 
+        [HttpPost]
+        public ActionResult AddUser([FromBody] User model)
+        {
+            return Ok($"User was added!");
+        }
+
     }
 }
