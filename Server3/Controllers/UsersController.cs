@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Library.Models;
+using Server3.Models.User;
 
 namespace Server3.Controllers
 {
@@ -14,9 +15,9 @@ namespace Server3.Controllers
     {
         //users/vasya
         [HttpGet("{id}")]
-        public ActionResult GetUser(string id)
+        public ActionResult<UserVM> GetUser(string id)
         {
-            var user = new User() {
+            var user = new UserVM() {
                 Id = 111,
                 Title = "Админ Рутович",
                 Birth = DateTime.Now.AddYears(-20)
@@ -31,7 +32,7 @@ namespace Server3.Controllers
         }
 
         [HttpPost]
-        public ActionResult AddUser([FromBody] User model)
+        public ActionResult AddUser([FromBody] UserCreateVM model)
         {
             return Ok($"User was added!");
         }
