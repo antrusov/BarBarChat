@@ -13,10 +13,24 @@ namespace Server3.Controllers
     [Route("users")]
     public class UsersController : ControllerBase
     {
+        private readonly BarBarContext _context;
+
+        public UsersController (BarBarContext context)
+        {
+            _context = context;
+
+            if (_context.Users.Count() == 0)             
+            {                 
+                _context.Users.Add(new User { Title = "first user", Birth = DateTime.UtcNow });
+                _context.SaveChanges();             
+            }  
+        }
+
         //users/vasya
         [HttpGet("{id}")]
         public ActionResult<UserVM> GetUser(string id)
         {
+            
             var user = new UserVM() {
                 Id = 111,
                 Title = "Админ Рутович",

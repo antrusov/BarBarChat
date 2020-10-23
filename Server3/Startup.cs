@@ -30,7 +30,7 @@ namespace Server3
         {
             services.AddDbContext<BarBarContext>
             (
-                options => options.UseNpgsql(Configuration.GetConnectionString("DefaultConnection"))
+                options => options.UseNpgsql(Configuration.GetConnectionString("DefaultConnection"), builder => builder.MigrationsAssembly("Server3"))
             );
             services.AddControllers();
             services.AddSwaggerGen(c =>
@@ -64,6 +64,13 @@ namespace Server3
             {
                 endpoints.MapControllers();
             });
+
+            using (var scope = app.ApplicationServices.GetRequiredService<IServiceScopeFactory>().CreateScope())
+            {
+                var dbContext = scope.ServiceProvider.GetService<BarBarContext>();
+                dbContext.Database.Migrate();
+            }
+
         }
     }
 }
