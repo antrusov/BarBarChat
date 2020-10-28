@@ -23,39 +23,64 @@ namespace Server3.Controllers
         {
             _context = context;
             _logger = logger;
-
-            if (_context.Users.Count() == 0)             
-            {                 
-                _context.Users.Add(new User { Title = "first user", Birth = DateTime.UtcNow });
-                _context.SaveChanges();             
-            }  
         }
 
         //users/vasya
         [HttpGet("{id}")]
-        public ActionResult<UserVM> GetUser(string id)
+        public ActionResult<UserVM> GetUser(int id)
         {
-            _logger.LogInformation("GetUser");
-            var user = new UserVM() {
-                Id = 111,
-                Title = "Админ Рутович",
-                Birth = DateTime.Now.AddYears(-20)
-            };
-            return Ok(user);
+            _logger.LogInformation($"GetUser: id={id}");
+            try
+            {
+                var user = _context.Users.Find(id);
+                if (user == null)
+                    return Ok(new { error = $"user width id={id} not found!" });    
+                return Ok(user);
+            }
+            catch(Exception ex)
+            {
+                _logger.LogError(ex.Message);
+                return Ok(new { error = ex.Message });
+            }
         }
 
         [HttpGet("search/{pattern}")]
         public ActionResult SearchUser(string pattern)
         {
-            _logger.LogInformation("SearchUser");
-            return Ok($"search result for pattern='{pattern}'");
+            _logger.LogInformation($"SearchUser: pattern={pattern}");
+            try
+            {
+                var users = _context.Users.Where(user => user.Title.IndexOf(pattern) != -1);
+                return Ok(users);
+            }
+            catch(Exception ex)
+            {
+                _logger.LogError(ex.Message);
+                return Ok(new { error = ex.Message });
+            }
         }
 
         [HttpPost]
         public ActionResult AddUser([FromBody] UserCreateVM model)
         {
-            _logger.LogInformation("AddUser");
-            return Ok($"User was added!");
+            _logger.LogInformation($"AddUser: Title={model.Title} Birth={model.Birth}");
+            try
+            {
+                var user = new User() {
+                    Title = model.Title,
+                    Birth = model.Birth
+                };
+
+                _context.Users.Add(user);
+                _context.SaveChanges();
+
+                return Ok(user);
+            }
+            catch(Exception ex)
+            {
+                _logger.LogError(ex.Message);
+                return Ok(new { error = ex.Message });
+            }
         }
 
     }
