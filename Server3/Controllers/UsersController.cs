@@ -14,10 +14,15 @@ namespace Server3.Controllers
     public class UsersController : ControllerBase
     {
         private readonly BarBarContext _context;
+        private readonly ILogger _logger;
 
-        public UsersController (BarBarContext context)
+        public UsersController (
+            BarBarContext context,
+            ILogger<UsersController> logger
+        )
         {
             _context = context;
+            _logger = logger;
 
             if (_context.Users.Count() == 0)             
             {                 
@@ -30,7 +35,7 @@ namespace Server3.Controllers
         [HttpGet("{id}")]
         public ActionResult<UserVM> GetUser(string id)
         {
-            
+            _logger.LogInformation("GetUser");
             var user = new UserVM() {
                 Id = 111,
                 Title = "Админ Рутович",
@@ -42,12 +47,14 @@ namespace Server3.Controllers
         [HttpGet("search/{pattern}")]
         public ActionResult SearchUser(string pattern)
         {
+            _logger.LogInformation("SearchUser");
             return Ok($"search result for pattern='{pattern}'");
         }
 
         [HttpPost]
         public ActionResult AddUser([FromBody] UserCreateVM model)
         {
+            _logger.LogInformation("AddUser");
             return Ok($"User was added!");
         }
 
