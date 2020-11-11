@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Library.Models;
+using Library.Services;
 using Server3.Models.User;
 
 namespace Server3.Controllers
@@ -15,14 +16,17 @@ namespace Server3.Controllers
     {
         private readonly BarBarContext _context;
         private readonly ILogger _logger;
+        private readonly AuthService _authService;
 
         public UsersController (
             BarBarContext context,
-            ILogger<UsersController> logger
+            ILogger<UsersController> logger,
+            AuthService authService
         )
         {
             _context = context;
             _logger = logger;
+            _authService = authService;
         }
 
         //users/vasya
@@ -74,6 +78,23 @@ namespace Server3.Controllers
                 _context.Users.Add(user);
                 _context.SaveChanges();
 
+                return Ok(user);
+            }
+            catch(Exception ex)
+            {
+                _logger.LogError(ex.Message);
+                return Ok(new { error = ex.Message });
+            }
+        }
+
+        [HttpPost("login")]
+        public ActionResult Login (string login, string pass)
+        {            
+            _logger.LogInformation($"Login: login={login} pass={pass}");
+            try
+            {
+                var user = _authService.GetUserByLoginAndPass(login, pass);
+                //...
                 return Ok(user);
             }
             catch(Exception ex)

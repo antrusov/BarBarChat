@@ -13,6 +13,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi.Models;
 using Microsoft.EntityFrameworkCore;
 using Library.Models;
+using Library.Services;
 
 namespace Server3
 {
@@ -37,6 +38,7 @@ namespace Server3
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "BarBarChat API", Version = "v1" });
             });
+            services.AddTransient<AuthService,AuthService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
