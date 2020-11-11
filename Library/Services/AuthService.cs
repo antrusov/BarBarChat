@@ -1,4 +1,6 @@
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using Microsoft.Extensions.Logging;
 using Library.Models;
 
@@ -20,14 +22,12 @@ namespace Library.Services
 
         public User GetUserByLoginAndPass(string login, string pass)
         {
-            //...
-            return null;
+            return _context.Users.Where(user => user.Login == login && user.Pass == pass).FirstOrDefault();
         }
 
         public User GetUserByAuthToken(string authToken)
         {
-            //...
-            return null;
+            return _context.Users.Where(user => user.Auth == authToken).FirstOrDefault();
         }
     }
 }
