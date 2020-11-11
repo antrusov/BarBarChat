@@ -6,6 +6,9 @@ namespace Library.Models
     {
         public int Id { get; set; }
         public string Title { get; set; }
-        public DateTime? Birth { get; set; }
+        public string Login { get; set; }
+        public string Pass { get; set; }
+        public string Auth { get; set; }
+        public DateTime? LastActivity { get; set; }
     }
 }

@@ -67,12 +67,13 @@ namespace Server3.Controllers
         [HttpPost]
         public ActionResult AddUser([FromBody] UserCreateVM model)
         {
-            _logger.LogInformation($"AddUser: Title={model.Title} Birth={model.Birth}");
+            _logger.LogInformation($"AddUser: Title={model.Title} Login={model.Login} Pass={model.Pass}");
             try
             {
                 var user = new User() {
                     Title = model.Title,
-                    Birth = model.Birth
+                    Login = model.Login,
+                    Pass = model.Pass
                 };
 
                 _context.Users.Add(user);
