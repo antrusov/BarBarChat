@@ -27,7 +27,22 @@ namespace Library.Services
 
         public User GetUserByAuthToken(string authToken)
         {
+            if (string.IsNullOrEmpty(authToken))
+                return null;
             return _context.Users.Where(user => user.Auth == authToken).FirstOrDefault();
+        }
+
+        public string AddAuthToken(User user)
+        {
+            user.Auth = Guid.NewGuid().ToString();
+            _context.SaveChanges();
+            return user.Auth;
+        }
+
+        public void RemoveAuthToken(User user)
+        {
+            user.Auth = null;
+            _context.SaveChanges();
         }
     }
 }

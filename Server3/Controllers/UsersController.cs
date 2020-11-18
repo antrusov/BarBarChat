@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
@@ -12,21 +13,19 @@ namespace Server3.Controllers
 {
     [ApiController]
     [Route("users")]
-    public class UsersController : ControllerBase
+    public class UsersController : BarBarControllerBase
     {
         private readonly BarBarContext _context;
         private readonly ILogger _logger;
-        private readonly AuthService _authService;
 
         public UsersController (
             BarBarContext context,
             ILogger<UsersController> logger,
             AuthService authService
-        )
+        ) : base(authService)
         {
             _context = context;
             _logger = logger;
-            _authService = authService;
         }
 
         //users/vasya
@@ -36,6 +35,7 @@ namespace Server3.Controllers
             _logger.LogInformation($"GetUser: id={id}");
             try
             {
+                CheckAuth();
                 var user = _context.Users.Find(id);
                 if (user == null)
                     return Ok(new { error = $"user width id={id} not found!" });    
@@ -54,6 +54,7 @@ namespace Server3.Controllers
             _logger.LogInformation($"SearchUser: pattern={pattern}");
             try
             {
+                CheckAuth();
                 var users = _context.Users.Where(user => user.Title.IndexOf(pattern) != -1);
                 return Ok(users);
             }
@@ -70,6 +71,8 @@ namespace Server3.Controllers
             _logger.LogInformation($"AddUser: Title={model.Title} Login={model.Login} Pass={model.Pass}");
             try
             {
+                CheckAuth();
+
                 var user = new User() {
                     Title = model.Title,
                     Login = model.Login,
@@ -95,8 +98,14 @@ namespace Server3.Controllers
             try
             {
                 var user = _authService.GetUserByLoginAndPass(login, pass);
-                //...
-                return Ok(user);
+                if (user == null)
+                    return Ok(new { error = "Неправильный логин/пароль." });
+                
+                var authToken = _authService.AddAuthToken(user);
+
+                Response.Cookies.Append("AuthToken", authToken);
+
+                return Ok();
             }
             catch(Exception ex)
             {
@@ -105,5 +114,23 @@ namespace Server3.Controllers
             }
         }
 
+        [HttpPost("logout")]
+        public ActionResult Logout ()
+        {            
+            _logger.LogInformation($"Logout");
+            try
+            {
+                RemoveAuth();
+
+                Response.Cookies.Append("AuthToken", "");
+
+                return Ok();
+            }
+            catch(Exception ex)
+            {
+                _logger.LogError(ex.Message);
+                return Ok(new { error = ex.Message });
+            }
+        }
     }
 }
