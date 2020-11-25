@@ -33,104 +33,65 @@ namespace Server3.Controllers
         public ActionResult<UserVM> GetUser(int id)
         {
             _logger.LogInformation($"GetUser: id={id}");
-            try
-            {
-                CheckAuth();
-                var user = _context.Users.Find(id);
-                if (user == null)
-                    return Ok(new { error = $"user width id={id} not found!" });    
-                return Ok(user);
-            }
-            catch(Exception ex)
-            {
-                _logger.LogError(ex.Message);
-                return Ok(new { error = ex.Message });
-            }
+            CheckAuth();
+
+            var user = _context.Users.Find(id);
+            if (user == null)
+                return Ok(new { error = $"user width id={id} not found!" });    
+            return Ok(user);
         }
 
         [HttpGet("search/{pattern}")]
         public ActionResult SearchUser(string pattern)
         {
             _logger.LogInformation($"SearchUser: pattern={pattern}");
-            try
-            {
-                CheckAuth();
-                var users = _context.Users.Where(user => user.Title.IndexOf(pattern) != -1);
-                return Ok(users);
-            }
-            catch(Exception ex)
-            {
-                _logger.LogError(ex.Message);
-                return Ok(new { error = ex.Message });
-            }
+            CheckAuth();
+            var users = _context.Users.Where(user => user.Title.IndexOf(pattern) != -1);
+            return Ok(users);
         }
 
         [HttpPost]
         public ActionResult AddUser([FromBody] UserCreateVM model)
         {
             _logger.LogInformation($"AddUser: Title={model.Title} Login={model.Login} Pass={model.Pass}");
-            try
-            {
-                CheckAuth();
+            CheckAuth();
 
-                var user = new User() {
-                    Title = model.Title,
-                    Login = model.Login,
-                    Pass = model.Pass
-                };
+            var user = new User() {
+                Title = model.Title,
+                Login = model.Login,
+                Pass = model.Pass
+            };
 
-                _context.Users.Add(user);
-                _context.SaveChanges();
+            _context.Users.Add(user);
+            _context.SaveChanges();
 
-                return Ok(user);
-            }
-            catch(Exception ex)
-            {
-                _logger.LogError(ex.Message);
-                return Ok(new { error = ex.Message });
-            }
+            return Ok(user);
         }
 
         [HttpPost("login")]
         public ActionResult Login (string login, string pass)
         {            
             _logger.LogInformation($"Login: login={login} pass={pass}");
-            try
-            {
-                var user = _authService.GetUserByLoginAndPass(login, pass);
-                if (user == null)
-                    return Ok(new { error = "Неправильный логин/пароль." });
-                
-                var authToken = _authService.AddAuthToken(user);
+            var user = _authService.GetUserByLoginAndPass(login, pass);
+            if (user == null)
+                return Ok(new { error = "Неправильный логин/пароль." });
+            
+            var authToken = _authService.AddAuthToken(user);
 
-                Response.Cookies.Append("AuthToken", authToken);
+            Response.Cookies.Append("AuthToken", authToken);
 
-                return Ok();
-            }
-            catch(Exception ex)
-            {
-                _logger.LogError(ex.Message);
-                return Ok(new { error = ex.Message });
-            }
+            return Ok();
         }
 
         [HttpPost("logout")]
         public ActionResult Logout ()
         {            
             _logger.LogInformation($"Logout");
-            try
-            {
-                RemoveAuth();
+            RemoveAuth();
 
-                Response.Cookies.Append("AuthToken", "");
+            Response.Cookies.Append("AuthToken", "");
 
-                return Ok();
-            }
-            catch(Exception ex)
-            {
-                _logger.LogError(ex.Message);
-                return Ok(new { error = ex.Message });
-            }
+            return Ok();
         }
     }
 }

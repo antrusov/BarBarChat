@@ -12,6 +12,8 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi.Models;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Diagnostics;
+using Microsoft.AspNetCore.Http;
 using Library.Models;
 using Library.Services;
 
@@ -58,6 +60,15 @@ namespace Server3
 
             //app.UseHttpsRedirection();
 
+            app.UseExceptionHandler(a => a.Run(async context =>
+            {
+                var exceptionHandlerPathFeature = context.Features.Get<IExceptionHandlerPathFeature>();
+                var exception = exceptionHandlerPathFeature.Error;
+                
+                context.Response.ContentType = "application/json";
+                await context.Response.WriteAsync("{\"error\":\"" + exception.Message + "\"}");
+            }));
+
             app.UseRouting();
 
             //app.UseAuthorization();
@@ -72,7 +83,7 @@ namespace Server3
                 var dbContext = scope.ServiceProvider.GetService<BarBarContext>();
                 dbContext.Database.Migrate();
             }
-
+            
         }
     }
 }
