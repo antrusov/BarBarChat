@@ -9,24 +9,34 @@ using Library.Models;
 using Library.Services;
 using Server3.Models.User;
 using Server3.Infrastructure.Jwt;
+using System.ComponentModel.DataAnnotations;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
+using System.Text;
+using System.Text.Json.Serialization;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.IdentityModel.Tokens;
+using Server3.Models;
 
 namespace Server3.Controllers
 {
     [ApiController]
     [Route("users")]
-    public class UsersController : BarBarControllerBase
+    public class UsersController : ControllerBase
     {
-        private readonly TokenSettings _tokenSettings;
-        private readonly BarBarContext _context;
-        private readonly ILogger _logger;
+        readonly AuthService _authService;
+        readonly TokenSettings _tokenSettings;
+        readonly BarBarContext _context;
+        readonly ILogger _logger;
 
         public UsersController (
+            AuthService authService,
             TokenSettings tokenSettings,
             BarBarContext context,
-            ILogger<UsersController> logger,
-            AuthService authService
-        ) : base(authService)
+            ILogger<UsersController> logger
+        )
         {
+            _authService = authService;
             _tokenSettings = tokenSettings;
             _context = context;
             _logger = logger;
@@ -34,10 +44,10 @@ namespace Server3.Controllers
 
         //users/vasya
         [HttpGet("{id}")]
+        [Authorize]
         public ActionResult<UserVM> GetUser(int id)
         {
             _logger.LogInformation($"GetUser: id={id}");
-            CheckAuth();
 
             var user = _context.Users.Find(id);
             if (user == null)
@@ -49,7 +59,6 @@ namespace Server3.Controllers
         public ActionResult SearchUser(string pattern)
         {
             _logger.LogInformation($"SearchUser: pattern={pattern}");
-            CheckAuth();
             var users = _context.Users.Where(user => user.Title.IndexOf(pattern) != -1);
             return Ok(users);
         }
@@ -58,7 +67,6 @@ namespace Server3.Controllers
         public ActionResult AddUser([FromBody] UserCreateVM model)
         {
             _logger.LogInformation($"AddUser: Title={model.Title} Login={model.Login} Pass={model.Pass}");
-            CheckAuth();
 
             var user = new User() {
                 Title = model.Title,
@@ -72,21 +80,46 @@ namespace Server3.Controllers
             return Ok(user);
         }
 
+        [AllowAnonymous]
         [HttpPost("login")]
-        public ActionResult Login (string login, string pass)
-        {            
-            _logger.LogInformation($"Login: login={login} pass={pass}");
-            var user = _authService.GetUserByLoginAndPass(login, pass);
+        public ActionResult Login ([FromBody] LoginRequestVM request)
+        {
+            _logger.LogInformation($"Login: {request}");
+
+            if (!ModelState.IsValid)
+            {
+                return BadRequest("Invalid Request");
+            }
+
+            var user = _authService.GetUserByLoginAndPass(request.UserName, request.Password);
             if (user == null)
-                return Ok(new { error = "Неправильный логин/пароль." });
-            
-            var authToken = _authService.AddAuthToken(user);
+            {
+                return BadRequest("Invalid Request");
+            }
 
-            Response.Cookies.Append("AuthToken", authToken);
+            var claims = new[]
+            {
+                new Claim(ClaimTypes.Name,request.UserName)
+            };
 
-            return Ok();
+            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_tokenSettings.Secret));
+            var credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
+            var jwtToken = new JwtSecurityToken(
+                _tokenSettings.Issuer,
+                _tokenSettings.Audience,
+                claims,
+                expires: DateTime.Now.AddMinutes(_tokenSettings.AccessExpiration),
+                signingCredentials: credentials);
+            var token = new JwtSecurityTokenHandler().WriteToken(jwtToken);
+            _logger.LogInformation($"User [{request.UserName}] logged in the system.");
+            return Ok(new LoginResultVM
+            {
+                UserName = request.UserName,
+                JwtToken = token
+            });
         }
 
+        /*
         [HttpPost("logout")]
         public ActionResult Logout ()
         {            
@@ -96,6 +129,6 @@ namespace Server3.Controllers
             Response.Cookies.Append("AuthToken", "");
 
             return Ok();
-        }
+        }*/
     }
 }
