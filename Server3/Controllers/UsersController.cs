@@ -8,6 +8,7 @@ using Microsoft.Extensions.Logging;
 using Library.Models;
 using Library.Services;
 using Server3.Models.User;
+using Server3.Infrastructure.Jwt;
 
 namespace Server3.Controllers
 {
@@ -15,15 +16,18 @@ namespace Server3.Controllers
     [Route("users")]
     public class UsersController : BarBarControllerBase
     {
+        private readonly TokenSettings _tokenSettings;
         private readonly BarBarContext _context;
         private readonly ILogger _logger;
 
         public UsersController (
+            TokenSettings tokenSettings,
             BarBarContext context,
             ILogger<UsersController> logger,
             AuthService authService
         ) : base(authService)
         {
+            _tokenSettings = tokenSettings;
             _context = context;
             _logger = logger;
         }

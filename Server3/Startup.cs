@@ -16,6 +16,7 @@ using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Http;
 using Library.Models;
 using Library.Services;
+using Server3.Infrastructure.Jwt;
 
 namespace Server3
 {
@@ -36,6 +37,10 @@ namespace Server3
                 options => options.UseNpgsql(Configuration.GetConnectionString("DefaultConnection"), builder => builder.MigrationsAssembly("Server3"))
             );
             services.AddControllers();
+
+            var token = Configuration.GetSection("TokenSettings").Get<TokenSettings>();
+            services.AddSingleton(token);
+
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "BarBarChat API", Version = "v1" });
